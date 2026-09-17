@@ -34,10 +34,9 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv pip install --no-deps .
 
 # Clean up: remove unneeded runtime packages and files in a single layer
-# Verified: pocket_tts loads fine without sympy, networkx, pygments, pip, setuptools
-RUN rm -rf /usr/local/lib/python3.13/site-packages/sympy \
-           /usr/local/lib/python3.13/site-packages/sympy-*.dist-info \
-           /usr/local/lib/python3.13/site-packages/networkx \
+# sympy must NOT be removed: torch._dynamo imports sympy at module load time
+# via torch.compiler (used by pocket_tts modules/attention.py), see issue #39.
+RUN rm -rf /usr/local/lib/python3.13/site-packages/networkx \
            /usr/local/lib/python3.13/site-packages/networkx-*.dist-info \
            /usr/local/lib/python3.13/site-packages/pygments \
            /usr/local/lib/python3.13/site-packages/Pygments-*.dist-info \
